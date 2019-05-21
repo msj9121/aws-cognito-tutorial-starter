@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import Hero from './Hero';
 import HomeContent from './HomeContent';
 
-export default function Home() {
+export default function Home(props) {
   return (
     <Fragment>
       <Hero />

@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import FormErrors from "../FormErrors";
 import Validate from "../utility/FormValidation";
+import { Auth } from "aws-amplify";
 
 class Register extends Component {
   state = {
@@ -13,7 +14,7 @@ class Register extends Component {
       blankfield: false,
       passwordmatch: false
     }
-  }
+  };
 
   clearErrorState = () => {
     this.setState({
@@ -23,7 +24,7 @@ class Register extends Component {
         passwordmatch: false
       }
     });
-  }
+  };
 
   handleSubmit = async event => {
     event.preventDefault();
@@ -38,6 +39,29 @@ class Register extends Component {
     }
 
     // AWS Cognito integration here
+    const { username, email, password } = this.state;
+    try {
+      const signUpResponse = await Auth.signUp({
+        username,
+        password,
+        attributes: {
+          email: email
+        }
+      })
+
+      console.log("A", signUpResponse)
+
+      this.props.history.push("/welcome");
+    } catch (error) {
+      let err = null;
+      !error.message ? (err = { message: error }) : (err = error);
+      this.setState({
+        errors: {
+          ...this.state.errors,
+          cognito: err
+        }
+      });
+    }
   };
 
   onInputChange = event => {
@@ -45,7 +69,7 @@ class Register extends Component {
       [event.target.id]: event.target.value
     });
     document.getElementById(event.target.id).classList.remove("is-danger");
-  }
+  };
 
   render() {
     return (
@@ -57,8 +81,8 @@ class Register extends Component {
           <form onSubmit={this.handleSubmit}>
             <div className="field">
               <p className="control">
-                <input 
-                  className="input" 
+                <input
+                  className="input"
                   type="text"
                   id="username"
                   aria-describedby="userNameHelp"
@@ -70,8 +94,8 @@ class Register extends Component {
             </div>
             <div className="field">
               <p className="control has-icons-left has-icons-right">
-                <input 
-                  className="input" 
+                <input
+                  className="input"
                   type="email"
                   id="email"
                   aria-describedby="emailHelp"
@@ -80,14 +104,14 @@ class Register extends Component {
                   onChange={this.onInputChange}
                 />
                 <span className="icon is-small is-left">
-                  <i className="fas fa-envelope"></i>
+                  <i className="fas fa-envelope" />
                 </span>
               </p>
             </div>
             <div className="field">
               <p className="control has-icons-left">
-                <input 
-                  className="input" 
+                <input
+                  className="input"
                   type="password"
                   id="password"
                   placeholder="Password"
@@ -95,14 +119,14 @@ class Register extends Component {
                   onChange={this.onInputChange}
                 />
                 <span className="icon is-small is-left">
-                  <i className="fas fa-lock"></i>
+                  <i className="fas fa-lock" />
                 </span>
               </p>
             </div>
             <div className="field">
               <p className="control has-icons-left">
-                <input 
-                  className="input" 
+                <input
+                  className="input"
                   type="password"
                   id="confirmpassword"
                   placeholder="Confirm password"
@@ -110,7 +134,7 @@ class Register extends Component {
                   onChange={this.onInputChange}
                 />
                 <span className="icon is-small is-left">
-                  <i className="fas fa-lock"></i>
+                  <i className="fas fa-lock" />
                 </span>
               </p>
             </div>
@@ -121,7 +145,10 @@ class Register extends Component {
             </div>
             <div className="field">
               <p className="control">
-                <button className="button is-success">
+                <button
+                  className="button is-success"
+                  onClick={this.handleSubmit}
+                >
                   Register
                 </button>
               </p>

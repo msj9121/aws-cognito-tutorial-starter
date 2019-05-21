@@ -1,12 +1,31 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
+import { Auth } from "aws-amplify";
 
 export default class Navbar extends Component {
+  _handleLogOut = event => {
+    const { _setAuthStatus, _setUser } = this.props.auth;
+    event.preventDefault();
+    try {
+      Auth.signOut();
+      _setAuthStatus(true);
+      _setUser(null);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   render() {
+    const { isAuthenticated, user } = this.props.auth;
     return (
       <nav className="navbar" role="navigation" aria-label="main navigation">
         <div className="navbar-brand">
           <a className="navbar-item" href="/">
-            <img src="hexal-logo.png" width="112" height="28" alt="hexal logo" />
+            <img
+              src="hexal-logo.png"
+              width="112"
+              height="28"
+              alt="hexal logo"
+            />
           </a>
         </div>
 
@@ -25,18 +44,25 @@ export default class Navbar extends Component {
 
           <div className="navbar-end">
             <div className="navbar-item">
-              <div className="buttons">
-                <a href="/register" className="button is-primary">
-                  <strong>Register</strong>
-                </a>
-                <a href="/login" className="button is-light">
-                  Log in
-                </a>
-              </div>
+              {isAuthenticated && user ? (
+                <div className="logout">
+                  <div className="user">Hello! {user}</div>
+                  <div className="button is-light btn-logout" onClick={this._handleLogOut}>Logout</div>
+                </div>
+              ) : (
+                <div className="buttons">
+                  <a href="/register" className="button is-primary">
+                    <strong>Register</strong>
+                  </a>
+                  <a href="/login" className="button is-light">
+                    Log in
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </nav>
-    )
+    );
   }
 }
